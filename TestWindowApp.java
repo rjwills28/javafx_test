@@ -6,46 +6,113 @@ import javafx.stage.Stage;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.application.Platform;
 
 public class TestWindowApp extends Application {
+	//Configurable
+	int numWindows = 10;
+	int numWidgets = 20;
+
+	final static int MAX_NUM_WIDGETS = 100;
+
 	@Override
 	public void start(Stage priStage) throws Exception {
-		//Create the root node Group object
-		Group group = new Group();
-		ObservableList objsList = group.getChildren();
+		int winXpos = 0;
+		int winYpos = 0;
 
-		//Create a rectangle
-		Rectangle rec = new Rectangle();
-		//Set position from top left
-		rec.setX(100);
-		rec.setY(100);
-		rec.setWidth(20);
-		rec.setHeight(20);
-		rec.setFill(Color.GREY);
-		rec.setStroke(Color.BLACK);
-		// Add to group
-		objsList.add(rec);
+		// Set max number of widget
+		if (numWidgets > MAX_NUM_WIDGETS) {
+			numWidgets = MAX_NUM_WIDGETS;
+		}
 
-		//Create text
-		Text text = new Text(105, 115, "0");
-		text.setFill(Color.GREEN);
-		text.setStrokeWidth(2);
-		objsList.add(text);
+		// Create n window
+		for (int n = 0; n < numWindows; n++) {
+			//Adjust position on screen
+			if (n % 5 == 0 && n < 20 && n != 0) {
+				winXpos = 0;
+				winYpos = winYpos + 300;
+			}
 
-		//Create a scene of height and width
-		Scene scene = new Scene(group, 400, 400);
+			//Create the root node Group object
+			Group group = new Group();
+			ObservableList objsList = group.getChildren();
 
-		//Give it a colour
-		scene.setFill(Color.GREY);
+			// Starting pos
+			int xpos = 50;
+			int ypos = 10;
+			//Create widgets to add to the group
+			for (int i = 0; i < numWidgets; i++) {
+				if (i % 10 == 0) {
+					ypos = ypos + 25;
+					xpos = 50;
+				}
+				//Create a rectangle
+				Rectangle rec = new Rectangle();
+				//Set position from top left
+				rec.setX(xpos);
+				rec.setY(ypos);
+				rec.setWidth(20);
+				rec.setHeight(20);
+				rec.setFill(Color.GREY);
+				rec.setStroke(Color.BLACK);
+				// Add to group
+				objsList.add(rec);
 
-		//Title
-		priStage.setTitle("Test Standalone Window Application");
+				//Create text
+				Text text = new Text(xpos+5, ypos+15, "");
+				text.setFill(Color.LIME);
+				text.setStrokeWidth(2);
+				objsList.add(text);
 
-		//Add scene to stage
-		priStage.setScene(scene);
+				//Update widget values at 10Hz
+				Task<Void> task = new Task<Void>() {
+					String value = "";
 
-		//Display
-		priStage.show();
+					@Override
+					public Void call() throws Exception{
+						int i = 0;
+						while(true) {
+							if (i == 0) {
+								i = 1;
+								value = "1";
+							} else {
+								i = 0;
+								value = "0";
+							}
+							Platform.runLater(() -> {
+								text.setText(value);
+							});S
+							Thread.sleep(100);
+						}
+					}
+				};
+				Thread th = new Thread(task);
+				th.setDaemon(true);
+				th.start();
+
+				// Adjust xpos of next widget
+				xpos = xpos + 25;
+			}
+
+			//Create a scene of height and width
+			Scene scene = new Scene(group, 350, 400);
+
+			//Give it a colour
+			scene.setFill(Color.GREY);
+
+			// Create a new Stage (window)
+			Stage secondStage = new Stage();
+			secondStage.setTitle("Test Standalone Window " + (n + 1));
+			secondStage.setWidth(350);
+			secondStage.setHeight(400);
+			secondStage.setX(winXpos);
+			secondStage.setY(winYpos);
+			secondStage.setScene(scene);
+			secondStage.show();
+
+			winXpos = winXpos + 350;
+		}
 	}
 
 	public static void main(String args[]) {
