@@ -82,7 +82,7 @@ public class TestWindowApp extends Application {
 							}
 							Platform.runLater(() -> {
 								text.setText(value);
-							});S
+							});
 							Thread.sleep(100);
 						}
 					}
