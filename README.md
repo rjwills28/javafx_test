@@ -16,7 +16,7 @@ Requirements
   git clone git@github.com:epics-base/jca.git
   cd jca
   mvn install -DskipTests
-  export PATH_TO_JCA=/home/rjaw/javafx/jca/target/jca-2.4.11-SNAPSHOT.jar
+  export PATH_TO_JCA=/path/to/jca/target/jca-2.X.XX-SNAPSHOT.jar
   ```
 
 Compile
