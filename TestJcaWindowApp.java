@@ -12,9 +12,7 @@ import javafx.application.Platform;
 import gov.aps.jca.JCALibrary;
 import gov.aps.jca.Channel;
 import gov.aps.jca.Context;
-import gov.aps.jca.dbr.DBRType;
 import gov.aps.jca.dbr.DBR;
-import gov.aps.jca.dbr.STRING;
 import gov.aps.jca.event.MonitorEvent;
 import gov.aps.jca.event.MonitorListener;
 import gov.aps.jca.Monitor;
@@ -22,13 +20,12 @@ import gov.aps.jca.CAStatus;
 
 public class TestJcaWindowApp extends Application {
 	//Configurable
-	int numWindows = 1;
+	int numWindows = 10;
 	int numWidgets = 20;
 
 	final static int MAX_NUM_WIDGETS = 100;
 
-	public void jcaSetup(Text text, String channelName){
-
+	public void jcaStartMonitor(Text text, String channelName){
         try {
         	Context context = null;
             JCALibrary jca = JCALibrary.getInstance();
@@ -92,34 +89,8 @@ public class TestJcaWindowApp extends Application {
 				text.setStrokeWidth(2);
 				objsList.add(text);
 
-				String channelName = "TEST:REC"+i;
-				jcaSetup(text, channelName);
-
-				//Update widget values at 10Hz
-				Task<Void> task = new Task<Void>() {
-					String value = "";
-
-					@Override
-					public Void call() throws Exception{
-						int i = 0;
-						while(true) {
-							if (i == 0) {
-								i = 1;
-								value = "1";
-							} else {
-								i = 0;
-								value = "0";
-							}
-							Platform.runLater(() -> {
-								text.setText(value);
-							});
-							Thread.sleep(100);
-						}
-					}
-				};
-				Thread th = new Thread(task);
-				//th.setDaemon(true);
-				//th.start();
+				String channelName = "TEST:REC"+(n * numWidgets + i);
+				jcaStartMonitor(text, channelName);
 
 				// Adjust xpos of next widget
 				xpos = xpos + 30;
@@ -146,21 +117,19 @@ public class TestJcaWindowApp extends Application {
 	}
 
 	private static class MonitorListenerImpl implements MonitorListener {
-		private Text text;
+		private Text textWidget;
 
 		MonitorListenerImpl(Text text) {
-			this.text = text;
+			this.textWidget = text;
 		}
         public void monitorChanged(MonitorEvent event) {
-            // immediately print info
             DBR dbr = null;
             if (event.getStatus() == CAStatus.NORMAL) {
                 dbr = event.getDBR();
                 double[] val = ((double[] ) dbr.getValue());
                 Platform.runLater(() -> {
-					text.setText(String.valueOf(val[0]));
+					textWidget.setText(String.valueOf(val[0]));
 				});
-                //System.out.println(val[0]);
             } else
                 System.err.println("Monitor error: " + event.getStatus());
         }
@@ -169,7 +138,6 @@ public class TestJcaWindowApp extends Application {
 	
 
 	public static void main(String args[]) {
-
 		launch(args);
 	}
 }

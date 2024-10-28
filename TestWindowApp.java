@@ -44,7 +44,7 @@ public class TestWindowApp extends Application {
 			//Create widgets to add to the group
 			for (int i = 0; i < numWidgets; i++) {
 				if (i % 10 == 0) {
-					ypos = ypos + 25;
+					ypos = ypos + 30;
 					xpos = 50;
 				}
 				//Create a rectangle
@@ -52,8 +52,8 @@ public class TestWindowApp extends Application {
 				//Set position from top left
 				rec.setX(xpos);
 				rec.setY(ypos);
-				rec.setWidth(20);
-				rec.setHeight(20);
+				rec.setWidth(28);
+				rec.setHeight(28);
 				rec.setFill(Color.GREY);
 				rec.setStroke(Color.BLACK);
 				// Add to group
@@ -75,10 +75,10 @@ public class TestWindowApp extends Application {
 						while(true) {
 							if (i == 0) {
 								i = 1;
-								value = "1";
+								value = "1.0";
 							} else {
 								i = 0;
-								value = "0";
+								value = "0.0";
 							}
 							Platform.runLater(() -> {
 								text.setText(value);
@@ -92,11 +92,11 @@ public class TestWindowApp extends Application {
 				th.start();
 
 				// Adjust xpos of next widget
-				xpos = xpos + 25;
+				xpos = xpos + 30;
 			}
 
 			//Create a scene of height and width
-			Scene scene = new Scene(group, 350, 400);
+			Scene scene = new Scene(group, 400, 400);
 
 			//Give it a colour
 			scene.setFill(Color.GREY);
@@ -104,7 +104,7 @@ public class TestWindowApp extends Application {
 			// Create a new Stage (window)
 			Stage secondStage = new Stage();
 			secondStage.setTitle("Test Standalone Window " + (n + 1));
-			secondStage.setWidth(350);
+			secondStage.setWidth(400);
 			secondStage.setHeight(400);
 			secondStage.setX(winXpos);
 			secondStage.setY(winYpos);
