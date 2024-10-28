@@ -24,10 +24,13 @@ Compile
 ```
 javac --module-path $PATH_TO_FX --add-modules javafx.controls TestWindowApp.java
 javac -cp .:$PATH_TO_JCA -p $PATH_TO_FX --add-modules javafx.controls TestJcaWindowApp.java
+javac --module-path $PATH_TO_FX --add-modules javafx.controls TestHighCPUWindowApp.java
+
 ```
 Run
 ---
 ```
 java --module-path $PATH_TO_FX --add-modules javafx.controls TestWindowApp
 java -cp .:$PATH_TO_JCA -p $PATH_TO_FX --add-modules javafx.controls TestJcaWindowApp
+java --module-path $PATH_TO_FX --add-modules javafx.controls TestHighCPUWindowApp
 ```
