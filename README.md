@@ -11,14 +11,23 @@ Requirements
   ```
   export PATH_TO_FX=/path/to/javafx-sdk-XX.XX.XX/lib
   ```
+- Requires JCA:
+  ```
+  git clone git@github.com:epics-base/jca.git
+  cd jca
+  mvn install -DskipTests
+  export PATH_TO_JCA=/home/rjaw/javafx/jca/target/jca-2.4.11-SNAPSHOT.jar
+  ```
 
 Compile
 -------
 ```
 javac --module-path $PATH_TO_FX --add-modules javafx.controls TestWindowApp.java
+javac -cp .:$PATH_TO_JCA -p $PATH_TO_FX --add-modules javafx.controls TestJcaWindowApp.java
 ```
 Run
 ---
 ```
 java --module-path $PATH_TO_FX --add-modules javafx.controls TestWindowApp
+java -cp .:$PATH_TO_JCA -p $PATH_TO_FX --add-modules javafx.controls TestJcaWindowApp
 ```
