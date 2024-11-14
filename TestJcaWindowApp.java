@@ -8,6 +8,9 @@ import javafx.scene.text.Text;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.application.Platform;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 
 import gov.aps.jca.JCALibrary;
 import gov.aps.jca.Channel;
@@ -58,9 +61,10 @@ public class TestJcaWindowApp extends Application {
 				winYpos = winYpos + 300;
 			}
 
-			//Create the root node Group object
-			Group group = new Group();
-			ObservableList objsList = group.getChildren();
+			//Create the root node object
+			BorderPane layout = new BorderPane();
+			BorderPane tabLayout = new BorderPane();
+ 			ObservableList objsList = tabLayout.getChildren();
 
 			// Starting pos
 			int xpos = 50;
@@ -97,7 +101,12 @@ public class TestJcaWindowApp extends Application {
 			}
 
 			//Create a scene of height and width
-			Scene scene = new Scene(group, 400, 400);
+			TabPane tabPane = new TabPane();
+ 			Tab tab = new Tab("Tab 1");
+ 			tab.setContent(tabLayout);
+ 			tabPane.getTabs().add(tab);
+ 			layout.setCenter(tabPane);
+			Scene scene = new Scene(layout, 400, 400);
 
 			//Give it a colour
 			scene.setFill(Color.GREY);
