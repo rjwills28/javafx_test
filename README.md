@@ -21,8 +21,24 @@
 ## Usage
 - Clone.
 
-### JavaFX with internal updating widgets
+### Simple JavaFX with internal updating widgets
 The following applciation will create 10 windows each with 20 text widgets that are updating their value at 10Hz with an internal thread.
+
+- Compile:
+  ```
+  javac --module-path $PATH_TO_FX --add-modules javafx.controls TestSimpleApp.java
+  ```
+- Run:
+  ```
+  java --module-path $PATH_TO_FX --add-modules javafx.controls TestSimpleApp
+  ```
+- Monitor the CPU with the following helper script. Obtain the process ID (`<PID>`) for the Java app and run (in a separate terminal):
+  ```
+  ./cpu_monitor.sh -p <PID>
+  ```
+
+### JavaFX with internal updating widgets in a tabbed pane
+The following applciation will create 10 windows each with 20 text widgets that are updating their value at 10Hz with an internal thread. Built into a tabbed pane
 
 - Compile:
   ```
