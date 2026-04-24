@@ -15,6 +15,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.Parent;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.collections.FXCollections;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 
-public class TestWindowApp extends Application {
+public class TestWindowApp3 extends Application {
     //Configurables
     /* Preselect:
         1: 1 window, 1000 widgets
@@ -48,14 +49,13 @@ public class TestWindowApp extends Application {
             sceneHeight = 800;
 
         } else if (preSelectCase == 2){
-            numWindows = 5;
+            numWindows = 20;
             numWidgets = 50;
             numPerRow = 10;
             sceneWidth = 400;
             sceneHeight = 300;
         }
 
-        int interval = 100;
         int winXpos = 0;
         int winYpos = 0;
 
@@ -63,6 +63,8 @@ public class TestWindowApp extends Application {
         if (numWidgets > MAX_NUM_WIDGETS) {
             numWidgets = MAX_NUM_WIDGETS;
         }
+
+        ObservableList allTextWidgets = FXCollections.observableArrayList();
 
         // Create n window
         for (int n = 0; n < numWindows; n++) {
@@ -102,48 +104,9 @@ public class TestWindowApp extends Application {
                 Text text = new Text(xpos+5, ypos+17, "");
                 text.setFill(Color.LIME);
                 text.setStrokeWidth(2);
+                text.setId(name);
                 objsList.add(text);
-
-                //Update widget values at 10Hz
-                Task<Void> task = new Task<Void>() {
-                    String value = "";
-
-                    @Override
-                    public Void call() throws Exception{
-                        int i = 0;
-                        Instant next_update_log = Instant.now().plusSeconds(5);
-                        while(true) {
-                            final CountDownLatch done = new CountDownLatch(1);
-                            final long update_start = System.currentTimeMillis();
-                            if (i == 0) {
-                                i = 1;
-                                value = "0";
-                            } else {
-                                i = 0;
-                                value = "1";
-                            }
-                            Platform.runLater(() -> {
-                                text.setText(value);
-                                done.countDown();
-                            });
-                            while (! done.await(1000, TimeUnit.MILLISECONDS))
-                                // wait
-                                Thread.sleep(1);
-
-                            Thread.sleep(100);
-                            final long ms = System.currentTimeMillis() - update_start;
-                            final Instant now = Instant.now();
-                            if (now.isAfter(next_update_log) && name.equals("window0widget0")) {
-                                System.out.println("-> Update interval for 1 widget: " + ms + " ms => "
-                                        + (1000.0 / ((double) ms)) + " Hz vs "+ (1000/interval)+" Hz");
-                                next_update_log = now.plusSeconds(5);
-                            }
-                        }
-                    }
-                };
-                Thread th = new Thread(task);
-                th.setDaemon(true);
-                th.start();
+                allTextWidgets.add(text);
 
                 // Adjust xpos of next widget
                 xpos = xpos + 36;
@@ -183,8 +146,62 @@ public class TestWindowApp extends Application {
             //ArrayList<Node> nodes = new ArrayList<Node>();
             //addAllDescendents(scene.getRoot(), nodes);
             //System.out.println(nodes.size());
-
         }
+        updateWidgets(allTextWidgets);
+    }
+
+    private void updateWidgets(ObservableList widgets) {
+        //Update widget values at 10Hz
+        Task<Void> task = new Task<Void>() {
+            String value = "";
+            int interval = 100;
+
+            @Override
+            public Void call() throws Exception{
+                int i = 0;
+                Instant next_update_log = Instant.now().plusSeconds(5);
+
+                while(true) {
+                    final CountDownLatch done = new CountDownLatch(1);
+                    final long update_start = System.currentTimeMillis();
+                    if (i == 0) {
+                        i = 1;
+                        value = "0";
+                    } else {
+                        i = 0;
+                        value = "1";
+                    }
+                    Platform.runLater(() -> {
+                        for (int j = 0; j < widgets.size(); j++) {
+                            //name = widgets.get(j).getId();
+                            Node node = (Node) widgets.get(j);
+                            if (node instanceof Text) {
+                                Text text = (Text) node;
+                                text.setText(value);
+                            }
+                        }
+                        //text.setText(value);
+                        done.countDown();
+                    });
+                    while (! done.await(1000, TimeUnit.MILLISECONDS))
+                        // wait
+                        Thread.sleep(1);
+
+                    Thread.sleep(interval);
+                    final long ms = System.currentTimeMillis() - update_start;
+                    final Instant now = Instant.now();
+                    if (now.isAfter(next_update_log)) {
+                        System.out.println("-> Update interval for "
+                                +widgets.size()+" widgets: " + ms + " ms => "
+                                + (1000.0 / ((double) ms)) + " Hz vs "+ (1000/interval)+" Hz");
+                        next_update_log = now.plusSeconds(5);
+                    }
+                }
+            }
+        };
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
     }
 
     private static void addAllDescendents(Parent parent, ArrayList<Node> nodes) {
